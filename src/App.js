@@ -51,6 +51,7 @@ class App extends Component {
     }
   }
 
+// First creates the board rows through state
   CreateBoard = (props) => {
     return (
         <React.Fragment>
@@ -63,6 +64,8 @@ class App extends Component {
                 p2traps={props.p2traps}
                 p1den={props.p1den}
                 p2den={props.p2den}
+                p1piece={props.p1piece}
+                p2piece={props.p2piece}
               />
             </div>
           ))}
@@ -70,6 +73,7 @@ class App extends Component {
     )
   }
 
+// Assigns individual squares
   CreateSquare = (props) => {
     return (
       <React.Fragment>
@@ -81,12 +85,15 @@ class App extends Component {
           p2traps={props.p2traps}
           p1den={props.p1den}
           p2den={props.p2den}
+          p1piece={props.p1piece}
+          p2piece={props.p2piece}
         />
       ))}
       </React.Fragment>
     )
   }
 
+// Chooses terrain for squares
   CreateSquareType = (props) => {
     if (props.water.includes(props.square)) {
       return (
@@ -109,9 +116,56 @@ class App extends Component {
     } else {
       return (
         <div className="square ground">
-          {props.square}
+          <this.ShowPiece
+            square={props.square}
+            p1piece={props.p1piece}
+            p2piece={props.p2piece}
+          />
         </div>
       )
+    }
+  }
+
+// Chooses which piece to display
+  ShowPiece = (props) => {
+    const location = props.square
+    const p1 = props.p1piece
+    const p2 = props.p2piece
+    switch (location) {
+      case (p1.elephant):
+        return '🐘';
+      case (p1.lion):
+        return '🦁';
+      case (p1.tiger):
+        return '🐯';
+      case (p1.leopard):
+        return '🐆';
+      case (p1.dog):
+        return '🐶';
+      case (p1.wolf):
+        return '🐺';
+      case (p1.cat):
+        return '🐱';
+      case (p1.rat):
+        return '🐭';
+      case (p2.elephant):
+        return '🐘';
+      case (p2.lion):
+        return '🦁';
+      case (p2.tiger):
+        return '🐯';
+      case (p2.leopard):
+        return '🐆';
+      case (p2.dog):
+        return '🐶';
+      case (p2.wolf):
+        return '🐺';
+      case (p2.cat):
+        return '🐱';
+      case (p2.rat):
+        return '🐭';
+      default:
+        return props.square
     }
   }
 
@@ -127,6 +181,8 @@ class App extends Component {
           p2traps={this.state.p2trap}
           p1den={this.state.p1den}
           p2den={this.state.p2den}
+          p1piece={this.state.p1piece}
+          p2piece={this.state.p2piece}
         />
         </header>
       </div>
