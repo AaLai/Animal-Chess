@@ -2,15 +2,10 @@
 .square {
   border: 1px solid #999;
   float: left;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 34px;
-  height: 10%;
-  margin-right: -1px;
-  margin-top: -1px;
+  height: 12vh;
   padding: 0;
   text-align: center;
-  width: 10%;
+  width: 10vw;
 }
 
 .board-row:after {
@@ -20,7 +15,7 @@
 }
 
 .ground {
-  background: brown;
+  background: green;
 }
 
 .water {
@@ -33,4 +28,9 @@
 
 .den {
   background: white;
+}
+
+.piece {
+  height: 90%;
+  width: 90%;
 }
