@@ -14,6 +14,10 @@
   display: table;
 }
 
+.information-display {
+  font-size: 2vh;
+}
+
 .ground {
   background: green;
 }
