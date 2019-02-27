@@ -54,7 +54,8 @@ class App extends Component {
                  rat: 6
                },
       selectedAnimal: null,
-      currentPlayer: "p1"
+      currentPlayer: "p1",
+      winner: null
     }
   }
 
@@ -121,7 +122,6 @@ clickTerrain = (e, capture) => {
     }
   }
 }
-
 
 canMoveToLocation = (animal, currentLocation, newLocation) => {
   const water = this.state.water
@@ -202,6 +202,9 @@ animalCanJump = (selectedAnimal) => {
   return false;
 }
 
+newGame = () => {
+  window.location.reload();
+}
 
 
 // First creates the board rows through state
@@ -359,6 +362,7 @@ animalCanJump = (selectedAnimal) => {
           Current Turn: {this.state.currentPlayer},
           Current Animal: {this.state.selectedAnimal}
         </div>
+        <button type="button" onClick={this.newGame}>Reset</button>
         <header>
         <this.CreateBoard
           board={this.state.board}
