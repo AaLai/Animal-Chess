@@ -138,21 +138,29 @@ canMoveToLocation = (animal, currentLocation, newLocation) => {
   } else if (this.state.currentPlayer === "p2" && newLocation === this.state.p2den) {
     return false;
   } else if (this.animalCanJump(animal)) {
-    if (water.includes(currentLocation + 9) && water.includes(currentLocation + 18)) {
-      if (this.ratCheck([currentLocation + 9, currentLocation + 18])) {
-        return true;
+    if (newLocation === currentLocation + 27) {
+      if (water.includes(currentLocation + 9) && water.includes(currentLocation + 18)) {
+        if (this.ratCheck([currentLocation + 9, currentLocation + 18])) {
+          return true;
+        }
       }
-    } else if (water.includes(currentLocation - 9) && water.includes(currentLocation - 18)) {
-      if (this.ratCheck([currentLocation - 9, currentLocation - 18])) {
-        return true;
+    } else if (newLocation === currentLocation - 27) {
+      if (water.includes(currentLocation - 9) && water.includes(currentLocation - 18)) {
+        if (this.ratCheck([currentLocation - 9, currentLocation - 18])) {
+          return true;
+        }
       }
-    } else if (water.includes(currentLocation + 1) && water.includes(currentLocation + 2) && water.includes(currentLocation + 3)) {
-      if (this.ratCheck([currentLocation + 1, currentLocation + 2, currentLocation + 3])) {
-        return true;
+    } else if (newLocation === currentLocation + 4) {
+      if (water.includes(currentLocation + 1) && water.includes(currentLocation + 2) && water.includes(currentLocation + 3)) {
+        if (this.ratCheck([currentLocation + 1, currentLocation + 2, currentLocation + 3])) {
+          return true;
+        }
       }
-    } else if (water.includes(currentLocation - 1) && water.includes(currentLocation - 2) && water.includes(currentLocation - 3)) {
-      if (this.ratCheck([currentLocation - 1, currentLocation - 2, currentLocation - 3])) {
-        return true;
+    } else if (newLocation === currentLocation - 4) {
+      if (water.includes(currentLocation - 1) && water.includes(currentLocation - 2) && water.includes(currentLocation - 3)) {
+        if (this.ratCheck([currentLocation - 1, currentLocation - 2, currentLocation - 3])) {
+          return true;
+        }
       }
     } else if (!water.includes(newLocation)) {
       if (newLocation === currentLocation + 1 || newLocation === currentLocation - 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
