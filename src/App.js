@@ -74,26 +74,28 @@ clickAnimal = (e) => {
   } else if (currentPlayer === animalOwner) {
     const animal = e.target.getAttribute('animal')
     this.setState({ selectedAnimal: animal })
-// This block deals with animal capture logic
-// It may need to be seperated out soon...
   } else if (currentPlayer !== animalOwner) {
     const opposingAnimal = e.target.getAttribute('animal')
     const currentLocation = parseInt(this.state[currentPlayer][selectedAnimal])
     const newLocation = parseInt(this.state[animalOwner][opposingAnimal])
     const playerAnimalRank = Object.keys(this.state[currentPlayer]).indexOf(this.state.selectedAnimal);
     const opposingAnimalRank = Object.keys(this.state[animalOwner]).indexOf(opposingAnimal);
-    if (this.canCaptureOtherAnimal(playerAnimalRank, opposingAnimalRank, currentLocation, newLocation)) {
-      const currentPlayerAnimals = this.state[currentPlayer]
-      const opposingAnimals = this.state[animalOwner]
-      currentPlayerAnimals[this.state.selectedAnimal] = parseInt(newLocation)
-      opposingAnimals[opposingAnimal] = null
-      this.setState({ [currentPlayer]: currentPlayerAnimals,
-                        [animalOwner]: opposingAnimals,
-                        currentPlayer: this.state.currentPlayer === 'p1' ? 'p2' : 'p1',
-                       selectedAnimal: null
-                   })
+    if (this.canMoveToLocation(selectedAnimal, currentLocation, newLocation)) {
+      if (this.canCaptureOtherAnimal(playerAnimalRank, opposingAnimalRank, currentLocation, newLocation)) {
+        const currentPlayerAnimals = this.state[currentPlayer]
+        const opposingAnimals = this.state[animalOwner]
+        currentPlayerAnimals[this.state.selectedAnimal] = parseInt(newLocation)
+        opposingAnimals[opposingAnimal] = null
+        this.setState({ [currentPlayer]: currentPlayerAnimals,
+                          [animalOwner]: opposingAnimals,
+                          currentPlayer: this.state.currentPlayer === 'p1' ? 'p2' : 'p1',
+                         selectedAnimal: null
+                     })
+      } else {
+        alert("You can't capture this animal!")
+      }
     } else {
-      alert("You can't capture this animal!")
+      alert("You can't move here!")
     }
   }
 }
@@ -125,7 +127,13 @@ clickTerrain = (e, capture) => {
 
 canMoveToLocation = (animal, currentLocation, newLocation) => {
   const water = this.state.water
-  if (this.state.currentPlayer === "p1" && newLocation === this.state.p1den) {
+  if (this.state.currentPlayer === "p1" && newLocation === this.state.p2den) {
+    this.setState({winner: "p1"})
+    return true;
+  } else if (this.state.currentPlayer === "p2" && newLocation === this.state.p1den) {
+    this.setState({winner: "p2"})
+    return true;
+  } else if (this.state.currentPlayer === "p1" && newLocation === this.state.p1den) {
     return false;
   } else if (this.state.currentPlayer === "p2" && newLocation === this.state.p2den) {
     return false;
@@ -356,27 +364,36 @@ newGame = () => {
   }
 
   render() {
-    return (
-      <div>
-        <div className='information-display'>
-          Current Turn: {this.state.currentPlayer},
-          Current Animal: {this.state.selectedAnimal}
+    if (!this.state.winner) {
+      return (
+        <div>
+          <div className='information-display'>
+            Current Turn: {this.state.currentPlayer},
+            Current Animal: {this.state.selectedAnimal}
+          </div>
+          <button type="button" onClick={this.newGame}>Reset</button>
+          <header>
+          <this.CreateBoard
+            board={this.state.board}
+            water={this.state.water}
+            p1traps={this.state.p1traps}
+            p2traps={this.state.p2traps}
+            p1den={this.state.p1den}
+            p2den={this.state.p2den}
+            p1={this.state.p1}
+            p2={this.state.p2}
+          />
+          </header>
         </div>
-        <button type="button" onClick={this.newGame}>Reset</button>
+      );
+    } else {
+      return (
         <header>
-        <this.CreateBoard
-          board={this.state.board}
-          water={this.state.water}
-          p1traps={this.state.p1traps}
-          p2traps={this.state.p2traps}
-          p1den={this.state.p1den}
-          p2den={this.state.p2den}
-          p1={this.state.p1}
-          p2={this.state.p2}
-        />
+          {this.state.winner} Wins! Great work!
+          <button type="button" onClick={this.newGame}>Reset</button>
         </header>
-      </div>
-    );
+      );
+    }
   }
 }
 
