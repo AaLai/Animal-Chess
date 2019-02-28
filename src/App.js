@@ -55,6 +55,7 @@ class App extends Component {
                },
       selectedAnimal: null,
       currentPlayer: "p1",
+      selectedTile: null,
       winner: null
     }
   }
@@ -64,19 +65,23 @@ clickAnimal = (e) => {
   const selectedAnimal = this.state.selectedAnimal
   const currentPlayer = this.state.currentPlayer
   const animalOwner = e.target.getAttribute('player')
+  const currentLocation = parseInt(this.state[currentPlayer][selectedAnimal])
   if (!selectedAnimal) {
     if (currentPlayer === animalOwner) {
       const animal = e.target.getAttribute('animal')
-      this.setState({ selectedAnimal: animal })
+      this.setState({ selectedAnimal: animal,
+                        selectedTile: currentLocation
+                   })
     } else {
       alert("This is not your animal!")
     }
   } else if (currentPlayer === animalOwner) {
     const animal = e.target.getAttribute('animal')
-    this.setState({ selectedAnimal: animal })
+    this.setState({ selectedAnimal: animal,
+                      selectedTile: currentLocation
+                 })
   } else if (currentPlayer !== animalOwner) {
     const opposingAnimal = e.target.getAttribute('animal')
-    const currentLocation = parseInt(this.state[currentPlayer][selectedAnimal])
     const newLocation = parseInt(this.state[animalOwner][opposingAnimal])
     const playerAnimalRank = Object.keys(this.state[currentPlayer]).indexOf(this.state.selectedAnimal);
     const opposingAnimalRank = Object.keys(this.state[animalOwner]).indexOf(opposingAnimal);
@@ -114,11 +119,16 @@ clickTerrain = (e, capture) => {
   //
   if (this.state.selectedAnimal) {
     if (this.canMoveToLocation(this.state.selectedAnimal, currentLocation, newLocation)) {
-        animals[this.state.selectedAnimal] = parseInt(e.target.getAttribute('cell'))
-        this.setState({ [currentPlayer]: animals,
+      if (this.state.currentPlayer === "p1" && newLocation === this.state.p2den) {
+        this.setState({winner: "p1"})
+      } else if (this.state.currentPlayer === "p2" && newLocation === this.state.p1den) {
+        this.setState({winner: "p2"})
+      }
+      animals[this.state.selectedAnimal] = parseInt(e.target.getAttribute('cell'))
+      this.setState({ [currentPlayer]: animals,
                         currentPlayer: this.state.currentPlayer === 'p1' ? 'p2' : 'p1',
-                        selectedAnimal: null
-                     })
+                       selectedAnimal: null
+                   })
     } else {
       alert("You can't move there!")
     }
@@ -127,13 +137,7 @@ clickTerrain = (e, capture) => {
 
 canMoveToLocation = (animal, currentLocation, newLocation) => {
   const water = this.state.water
-  if (this.state.currentPlayer === "p1" && newLocation === this.state.p2den) {
-    this.setState({winner: "p1"})
-    return true;
-  } else if (this.state.currentPlayer === "p2" && newLocation === this.state.p1den) {
-    this.setState({winner: "p2"})
-    return true;
-  } else if (this.state.currentPlayer === "p1" && newLocation === this.state.p1den) {
+  if (this.state.currentPlayer === "p1" && newLocation === this.state.p1den) {
     return false;
   } else if (this.state.currentPlayer === "p2" && newLocation === this.state.p2den) {
     return false;
@@ -162,8 +166,16 @@ canMoveToLocation = (animal, currentLocation, newLocation) => {
           return true;
         }
       }
-    } else if (!water.includes(newLocation)) {
-      if (newLocation === currentLocation + 1 || newLocation === currentLocation - 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
+   } else if (!water.includes(newLocation)) {
+      if (currentLocation % 9 === 0) {
+        if (newLocation === currentLocation + 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
+          return true;
+        }
+      } else if ((currentLocation - 8) % 9 === 0 ) {
+        if (newLocation === currentLocation - 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
+          return true;
+        }
+      } else if (newLocation === currentLocation - 1 || newLocation === currentLocation + 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
         return true;
       }
     }
@@ -176,7 +188,15 @@ canMoveToLocation = (animal, currentLocation, newLocation) => {
       }
     }
   } else if (!water.includes(newLocation)) {
-    if (newLocation === currentLocation + 1 || newLocation === currentLocation - 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
+    if (currentLocation % 9 === 0) {
+      if (newLocation === currentLocation + 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
+        return true;
+      }
+    } else if ((currentLocation - 8) % 9 === 0 ) {
+      if (newLocation === currentLocation - 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
+        return true;
+      }
+    } else if (newLocation === currentLocation - 1 || newLocation === currentLocation + 1 || newLocation === currentLocation + 9 || newLocation === currentLocation - 9) {
       return true;
     }
   }
@@ -240,6 +260,9 @@ newGame = () => {
                 p2den={props.p2den}
                 p1={props.p1}
                 p2={props.p2}
+                selectedTile={props.selectedTile}
+                selectedAnimal={props.selectedAnimal}
+                canMoveToLocation={props.canMoveToLocation}
               />
             ))}
           </div>
@@ -251,45 +274,139 @@ newGame = () => {
 // Chooses terrain for squares
   CreateSquareType = (props) => {
     if (props.water.includes(props.square)) {
-      return (
-        <div className="square water" cell={props.square} onClick={this.clickTerrain}>
-          <this.Showanimal
-            square={props.square}
-            p1={props.p1}
-            p2={props.p2}
-          />
-        </div>
-      )
+      if (props.selectedAnimal && props.canMoveToLocation(props.selectedAnimal, props.selectedTile, props.square)) {
+        return (
+          <div className="square water highlight" cell={props.square} onClick={this.clickTerrain}>
+            <this.Showanimal
+              square={props.square}
+              p1={props.p1}
+              p2={props.p2}
+            />
+          </div>
+        )
+      } else {
+        return (
+          <div className="square water" cell={props.square} onClick={this.clickTerrain}>
+            <this.Showanimal
+              square={props.square}
+              p1={props.p1}
+              p2={props.p2}
+            />
+          </div>
+        )
+      }
     } else if (props.p1traps.includes(props.square) || props.p2traps.includes(props.square)) {
-      return (
-        <div className="square trap" cell={props.square} onClick={this.clickTerrain}>
-          <this.Showanimal
-            square={props.square}
-            p1={props.p1}
-            p2={props.p2}
-          />
-        </div>
-      )
-    } else if (props.p1den === props.square || props.p2den === props.square) {
-      return (
-        <div className="square den" cell={props.square} onClick={this.clickTerrain}>
-          <this.Showanimal
-            square={props.square}
-            p1={props.p1}
-            p2={props.p2}
-          />
-        </div>
-      )
+      if (props.selectedAnimal && props.canMoveToLocation(props.selectedAnimal, props.selectedTile, props.square)) {
+        return (
+          <div className="square trap highlight" cell={props.square} onClick={this.clickTerrain}>
+            <this.Showanimal
+              square={props.square}
+              p1={props.p1}
+              p2={props.p2}
+            />
+          </div>
+        )
+      } else {
+        return (
+          <div className="square trap" cell={props.square} onClick={this.clickTerrain}>
+            <this.Showanimal
+              square={props.square}
+              p1={props.p1}
+              p2={props.p2}
+            />
+          </div>
+        )
+      }
+    } else if (props.p1den === props.square) {
+      if (props.selectedAnimal && props.canMoveToLocation(props.selectedAnimal, props.selectedTile, props.square)) {
+        return (
+          <div className="square den1 highlight" cell={props.square} onClick={this.clickTerrain}>
+            <this.Showanimal
+              square={props.square}
+              p1={props.p1}
+              p2={props.p2}
+            />
+          </div>
+        )
+      } else {
+        return (
+          <div className="square den1" cell={props.square} onClick={this.clickTerrain}>
+            <this.Showanimal
+              square={props.square}
+              p1={props.p1}
+              p2={props.p2}
+            />
+          </div>
+        )
+      }
+    } else if (props.p2den === props.square) {
+      if (props.selectedAnimal && props.canMoveToLocation(props.selectedAnimal, props.selectedTile, props.square)) {
+        return (
+          <div className="square den2 highlight" cell={props.square} onClick={this.clickTerrain}>
+            <this.Showanimal
+              square={props.square}
+              p1={props.p1}
+              p2={props.p2}
+            />
+          </div>
+        )
+      } else {
+        return (
+          <div className="square den2" cell={props.square} onClick={this.clickTerrain}>
+            <this.Showanimal
+              square={props.square}
+              p1={props.p1}
+              p2={props.p2}
+            />
+          </div>
+        )
+      }
     } else {
-      return (
-        <div className="square ground" cell={props.square} onClick={this.clickTerrain}>
-          <this.Showanimal
-            square={props.square}
-            p1={props.p1}
-            p2={props.p2}
-          />
-        </div>
-      )
+      if (props.square % 2 === 0) {
+        if (props.selectedAnimal && props.canMoveToLocation(props.selectedAnimal, props.selectedTile, props.square)) {
+          return (
+            <div className="square ground highlight" cell={props.square} onClick={this.clickTerrain}>
+              <this.Showanimal
+                square={props.square}
+                p1={props.p1}
+                p2={props.p2}
+              />
+            </div>
+          )
+        } else {
+          return (
+            <div className="square ground" cell={props.square} onClick={this.clickTerrain}>
+              <this.Showanimal
+                square={props.square}
+                p1={props.p1}
+                p2={props.p2}
+              />
+            </div>
+          )
+        }
+      } else {
+        if (props.selectedAnimal && props.canMoveToLocation(props.selectedAnimal, props.selectedTile, props.square)) {
+          return (
+            <div className="square ground2 highlight" cell={props.square} onClick={this.clickTerrain}>
+              <this.Showanimal
+                square={props.square}
+                p1={props.p1}
+                p2={props.p2}
+              />
+            </div>
+          )
+        } else {
+          return (
+            <div className="square ground2" cell={props.square} onClick={this.clickTerrain}>
+              <this.Showanimal
+                square={props.square}
+                p1={props.p1}
+                p2={props.p2}
+              />
+            </div>
+          )
+        }
+      }
     }
   }
 
@@ -298,8 +415,6 @@ newGame = () => {
     const location = props.square
     const p1 = props.p1
     const p2 = props.p2
-
-
 
     switch (location) {
       case (p1.elephant):
@@ -367,7 +482,7 @@ newGame = () => {
           <img src={p2rat} alt={p2rat} className='animal' onClick={this.clickAnimal} cell={props.square} animal='rat' player='p2' />
         );
       default:
-        return props.square
+        return <div> </div>
     }
   }
 
@@ -390,6 +505,9 @@ newGame = () => {
             p2den={this.state.p2den}
             p1={this.state.p1}
             p2={this.state.p2}
+            selectedTile={this.state.selectedTile}
+            selectedAnimal={this.state.selectedAnimal}
+            canMoveToLocation={this.canMoveToLocation}
           />
           </header>
         </div>

@@ -1,6 +1,6 @@
 
 .square {
-  border: 1px solid #999;
+  box-sizing: border-box;
   float: left;
   height: 12vh;
   padding: 0;
@@ -19,23 +19,35 @@
 }
 
 .ground {
-  background: green;
+  background-image: url(./grass.png);
+}
+
+.ground2 {
+  background-image: url(./grass2.jpeg);
 }
 
 .water {
-  background: blue;
+  background-image: url(./water.gif);
 }
 
 .trap {
   background: grey;
 }
 
-.den {
-  background: white;
+.den1 {
+  background-image: url(./dungeon1.jpeg);
+}
+
+.den2 {
+  background-image: url(./dungeon2.jpg);
 }
 
 .animal {
   height: 90%;
   width: 90%;
+}
+
+.highlight {
+  border: 2px solid yellow;
 }
 
